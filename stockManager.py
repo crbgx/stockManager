@@ -1,7 +1,7 @@
 #bin/usr/stockManager
 
 #### Input data ####
-producedDay = [5, 0, 3, 5]
+producedDay = [5, 0, 2, 5]
 consumedDay = [4, 1, 3, 1]
 expectedDuration = 2    # Minimum value: 1
 
@@ -60,28 +60,35 @@ for index, i in enumerate(producedDay):
         stock[index] = producedDay[index] - consumedDay[index]
         if stock[index] >= 0:
             print(f'We have satisfied demand for day: {index} with stock with {expectedDuration} days left')
+            print(stock)
         else:
             error_demand(index)
 
 
     else:
         # Remove the ConsumedDay from the stock array
-        for j in range(0, expectedDuration-1):
+        for j in range(0, len(stock)):
             k = -j-1
             print(k)
+            print(f'stock {stock[k]}')
+            print(f'toConsume {toConsume[index]}')
             if stock[k] >= toConsume[index]:
                 stock[k] = stock[k] - toConsume[index]
                 toConsume[index] = 0
-                print(f'We have satisfied demand for day: {index} with stock with {expectedDuration - j} days left')
+                print(f'We have satisfied demand for day: {index} with stock with {-k} days left')
+                print(stock)
                 break
             else:
+                print('im else')
                 toConsume[index] = toConsume[index] - stock[k]
                 stock[k] = 0
 
-    if not(all([j >= 0 for j in toConsume])):
-        error_demand(index)
+            if j ==len(stock)-1 and toConsume[index] != 0:
+                error_demand(index)
+
+
+
 
 print('Simulation finished satisfactorily')
 print(f'Final stock: {stock}')
 print(f'Thrown away: {thrownAway}')
-
