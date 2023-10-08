@@ -1,9 +1,16 @@
-#bin/usr/stockManager
+#bin/usr/stockManager.py
+### CBGX ###
 
 #### Input data ####
-producedDay = [3, 0, 2, 5]
-consumedDay = [4, 1, 3, 1]
-expectedDuration = 2    # Minimum value: 2
+producedDay = [3, 2, 0, 0]
+consumedDay = [2, 1, 1, 1]
+expectedDuration = 1    # 1 => be produced and consumed the same day
+
+#################
+# 1 => Can ONLY be consumed on production day
+# 2 => Can be consumed on production day or the day after
+# 3 => Can be consumed on production day or two days after
+#################
 
 warningCounter = 0
 
@@ -17,10 +24,13 @@ def warning_demand(index, consumedDay):
 
 def success(stock, thrownAway):
     global warningCounter
+    print('***************************************')
     print(f'Simulation finished successfully with {warningCounter} warnings')
     print(f'Final stock: {stock}')
     print(f'Final consumedDay array: {consumedDay}')
     print(f'Thrown away: {thrownAway}')
+    print(f'Unsatisfied days: {warningCounter}')
+    print('***************************************')
 
 
 
@@ -60,13 +70,12 @@ def stockManager(consumedDay, producedDay, expectedDuration):
 
         # Remove demand from stock if possible
         for j in range(0, len(stock)):
-            k = -j-1
+            k = -j-1    # index conversion
             if stock[k] >= consumedDay[index]:
                 stock[k] = stock[k] - consumedDay[index]
                 consumedDay[index] = 0
-                print(f'We have satisfied demand for day: {index} with stock with {-k} days left')
+                print(f'Satisfied demand for day: {index} with stock with {j} days left')
                 break
-
             else:
                 consumedDay[index] = consumedDay[index] - stock[k]
                 stock[k] = 0
@@ -74,12 +83,15 @@ def stockManager(consumedDay, producedDay, expectedDuration):
             # Check if we run out of stock
             if j == len(stock)-1 and consumedDay[index] > 0:
                 if consumedDay[index] > 0:
-                    consumedDay[index+1] += abs(consumedDay[index])
-                    print(f'Out of stock. Day {index} updated demand: {consumedDay[index+1]}')
+                    if index == len(producedDay)-1:
+                        print(f'Out of stock on the last day. Missing {consumedDay[index]} stock')
+                    else:
+                        # Update demand for next day
+                        consumedDay[index+1] += abs(consumedDay[index])
+                        print(f'Out of stock. Day {index} updated demand: {consumedDay[index+1]}')
                 warning_demand(index, consumedDay)
 
     success(stock, thrownAway)
-    #end_program()
 
 
 
